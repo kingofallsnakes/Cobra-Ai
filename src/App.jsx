@@ -3,9 +3,9 @@ import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import { ClipLoader } from "react-spinners";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMicrophone, faVolumeUp, faPlay, faPause, faStop, faRedo } from '@fortawesome/free-solid-svg-icons';
+import { faMicrophone, faVolumeUp, faPlay, faPause, faStop, faRedo, faMoon, faSun, faDownload } from '@fortawesome/free-solid-svg-icons';
 import SplashScreen from './SplashScreen'; 
-import bujjiGif from './assets/bujji12.gif';
+import bujjiGif from './assets/bujji3.gif';
 import './App.css';
 
 function App() {
@@ -17,6 +17,7 @@ function App() {
   const [isPaused, setIsPaused] = useState(false);
   const [speechSynthesisUtterance, setSpeechSynthesisUtterance] = useState(null);
   const [showSplash, setShowSplash] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
 
   const API_KEY = "AIzaSyBhuYRkdE9ULfxl3w0iDkrOLGkbt7_zUHc";
 
@@ -24,12 +25,23 @@ function App() {
     if (!showSplash) {
       const greetUser = () => {
         const greetingMessage = "Hi, welcome to my World";
-        addMessage("Bujji AI", greetingMessage);
+        addMessage("Cobra AI", greetingMessage);
         speakText(greetingMessage);
       };
       greetUser();
     }
   }, [showSplash]);
+
+  useEffect(() => {
+    const savedMessages = JSON.parse(localStorage.getItem('messages'));
+    if (savedMessages) {
+      setMessages(savedMessages);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('messages', JSON.stringify(messages));
+  }, [messages]);
 
   const addMessage = (sender, text) => {
     setMessages((prevMessages) => [...prevMessages, { sender, text }]);
@@ -52,12 +64,12 @@ function App() {
       );
 
       const generatedAnswer = response.data.candidates[0].content.parts[0].text;
-      addMessage("Bujji AI", generatedAnswer);
+      addMessage("Cobra AI", generatedAnswer);
       setAnswer(generatedAnswer);
     } catch (error) {
       console.error(error);
       const errorMessage = "Sorry - Something went wrong. Please try again!";
-      addMessage("Bujji AI", errorMessage);
+      addMessage("Cobra AI", errorMessage);
       setAnswer(errorMessage);
     }
 
@@ -72,7 +84,7 @@ function App() {
     }
 
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'en-US';
+    recognition.lang = 'en-Uk';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
@@ -96,7 +108,7 @@ function App() {
     if (isPlaying) return;
     
     const utterance = new SpeechSynthesisUtterance();
-    utterance.lang = 'en-US';
+    utterance.lang = 'en-Uk';
     utterance.voice = speechSynthesis.getVoices().find(voice => voice.name.includes('Female')) || null;
     const lines = text.split('\n');
 
@@ -163,8 +175,21 @@ function App() {
     setShowSplash(false);
   };
 
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  const exportConversation = () => {
+    const element = document.createElement("a");
+    const file = new Blob([messages.map(msg => `${msg.sender}: ${msg.text}`).join('\n')], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = "conversation.txt";
+    document.body.appendChild(element);
+    element.click();
+  };
+
   return (
-    <div className="h-screen w-screen">
+    <div className={`h-screen w-screen ${darkMode ? 'dark' : ''}`}>
       {showSplash ? (
         <SplashScreen onStart={handleStart} />
       ) : (
@@ -176,17 +201,35 @@ function App() {
             backgroundPosition: "center",
           }}
         >
-          <div className="flex flex-col w-full max-w-2xl p-4 bg-white rounded-lg shadow-lg bg-opacity-80 backdrop-blur-md animate-shadowColorChangeInner">
+          <div className={`flex flex-col w-full max-w-2xl p-4 rounded-lg shadow-lg bg-opacity-80 backdrop-blur-md animate-shadowColorChangeInner ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
             <div className="flex justify-between items-center mb-4">
-              <h1 className="text-4xl font-bold text-black-500">Bujji AI</h1>
-              <button
-                type="button"
-                onClick={handleRestart}
-                className="bg-gray-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-gray-600 transition-all duration-300"
-                aria-label="Restart Application"
-              >
-                <FontAwesomeIcon icon={faRedo} size="lg" />
-              </button>
+              <h1 className="text-4xl font-bold">{darkMode ? 'Cobra AI' : 'Cobra AI'}</h1>
+              <div className="flex space-x-2">
+                <button
+                  type="button"
+                  onClick={handleRestart}
+                  className="bg-gray-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-gray-600 transition-all duration-300"
+                  aria-label="Restart Application"
+                >
+                  <FontAwesomeIcon icon={faRedo} size="lg" />
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleDarkMode}
+                  className="bg-gray-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-gray-600 transition-all duration-300"
+                  aria-label="Toggle Dark Mode"
+                >
+                  <FontAwesomeIcon icon={darkMode ? faSun : faMoon} size="lg" />
+                </button>
+                <button
+                  type="button"
+                  onClick={exportConversation}
+                  className="bg-gray-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-gray-600 transition-all duration-300"
+                  aria-label="Export Conversation"
+                >
+                  <FontAwesomeIcon icon={faDownload} size="lg" />
+                </button>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto mb-4">
               <div className="overflow-y-auto max-h-96">
@@ -197,61 +240,60 @@ function App() {
                   >
                     <div
                       className={`rounded-lg p-3 shadow-md animate-shadowColorChangeInner ${
-                        msg.sender === "User" ? "bg-orange-500 text-white" : "bg-gray-200"
+                        msg.sender === "User" ? "bg-orange-500 text-white" : "bg-gray-200 text-black"
                       }`}
-                      style={{ maxWidth: '80%' }}
                     >
+                      <p className="font-semibold">{msg.sender}:</p>
                       <ReactMarkdown>{msg.text}</ReactMarkdown>
                     </div>
                   </div>
                 ))}
               </div>
+              {generatingAnswer && (
+                <div className="flex justify-center mb-2">
+                  <ClipLoader color={"#ffffff"} size={50} />
+                </div>
+              )}
             </div>
-            <form onSubmit={generateAnswer} className="flex items-center mb-4">
-              <textarea
-                required
-                className="border border-gray-300 rounded-l w-full p-3 transition-all duration-300 focus:border-red-400 focus:shadow-lg"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    generateAnswer(e);
-                  }
-                }}
-                placeholder="Ask anything"
-                style={{ resize: 'none', minHeight: '50px' }}
-              ></textarea>
-              <button
-                type="button"
-                onClick={startVoiceRecognition}
-                className="text-gray-600 hover:text-gray-900 p-3 bg-white border-t border-b border-gray-300"
-                aria-label="Start Voice Recognition"
-              >
-                <FontAwesomeIcon icon={faMicrophone} size="lg" />
-              </button>
-              <button
-                type="submit"
-                className={`bg-blue-500 text-white py-3 px-4 rounded-r-md shadow-md hover:bg-red-600 transition-all duration-300 ${
-                  generatingAnswer ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                disabled={generatingAnswer}
-              >
-                {generatingAnswer ? <ClipLoader size={20} color={"#fff"} /> : "Send"}
-              </button>
-            </form>
-            <div className="flex justify-center space-x-4 mb-4">
+            <div className="mb-4">
+              <form onSubmit={generateAnswer} className="flex space-x-2">
+                <input
+                  type="text"
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  placeholder="Ask your question..."
+                  className="flex-1 py-2 px-4 rounded-md shadow-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300"
+                />
+                <button
+                  type="button"
+                  onClick={startVoiceRecognition}
+                  className="bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 transition-all duration-300"
+                  aria-label="Start Voice Recognition"
+                >
+                  <FontAwesomeIcon icon={faMicrophone} size="lg" />
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 transition-all duration-300"
+                  aria-label="Generate Answer"
+                >
+                  <FontAwesomeIcon icon={faPlay} size="lg" />
+                </button>
+              </form>
+            </div>
+            <div className="flex justify-center space-x-2">
               <button
                 type="button"
                 onClick={handlePlayResponse}
-                className="bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 transition-all duration-300"
+                className="bg-green-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-green-600 transition-all duration-300"
                 aria-label="Play Response"
               >
-                <FontAwesomeIcon icon={faPlay} size="lg" />
+                <FontAwesomeIcon icon={faVolumeUp} size="lg" />
               </button>
               <button
                 type="button"
                 onClick={handlePauseResponse}
-                className="bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 transition-all duration-300"
+                className="bg-yellow-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-yellow-600 transition-all duration-300"
                 aria-label="Pause Response"
               >
                 <FontAwesomeIcon icon={faPause} size="lg" />
@@ -259,7 +301,7 @@ function App() {
               <button
                 type="button"
                 onClick={handleStopResponse}
-                className="bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 transition-all duration-300"
+                className="bg-red-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-red-600 transition-all duration-300"
                 aria-label="Stop Response"
               >
                 <FontAwesomeIcon icon={faStop} size="lg" />
@@ -271,4 +313,5 @@ function App() {
     </div>
   );
 }
+
 export default App;

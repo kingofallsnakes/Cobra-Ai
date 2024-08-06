@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import Confetti from 'react-confetti';
 
 const SplashScreenWithLoading = ({ onStart }) => {
   const [animationClass, setAnimationClass] = useState('animate-bounce');
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [bgColor, setBgColor] = useState('bg-black');
 
   useEffect(() => {
     const animations = [
@@ -17,24 +20,58 @@ const SplashScreenWithLoading = ({ onStart }) => {
       setAnimationClass(animations[randomIndex]);
     };
 
-    const interval = setInterval(changeAnimation, 2000);
+    const changeBgColor = () => {
+      const colors = [
+  'bg-black', 
+  'bg-red-500', 
+  'bg-green-500', 
+  'bg-blue-500', 
+  'bg-yellow-500',
+  'bg-purple-500', 
+  'bg-pink-500', 
+  'bg-teal-500', 
+  'bg-indigo-500', 
+  'bg-gray-500'
+];
+
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      setBgColor(randomColor);
+    };
+
+    const interval = setInterval(() => {
+      changeAnimation();
+      changeBgColor();
+    }, 2000);
 
     return () => clearInterval(interval);
   }, []);
 
+  const handleStart = () => {
+    setShowConfetti(true);
+    setTimeout(() => {
+      setShowConfetti(false);
+      onStart();
+    }, 3000); // Show confetti for 3 seconds
+  };
+
   return (
-    <div className="h-screen w-screen flex flex-col justify-center items-center bg-black">
+    <div className={`h-screen w-screen flex flex-col justify-center items-center ${bgColor}`}>
       <div className="text-center">
-        <h1 className={`text-6xl font-bold text-blue-500 ${animationClass} shadow-title`}>
-          Bujji AI
-        </h1>
+        <h2 className={`text-4xl font-bold text-white ${animationClass} shadow-title`}>
+          Cobra AI
+        </h2>
         <button
-          onClick={onStart}
-          className="mt-10 py-1 px-3 bg-black text-white rounded-md shadow-md hover:bg-gray-800 transition-all duration-400 animate-button"
+          onClick={handleStart}
+          className="mt-6 py-1 px-1 bg-black text-white rounded-md shadow-md hover:bg-gray-800 transition-all duration-400 animate-button relative"
         >
-          Cobra
+          Let's Go
+          <span className="tooltip absolute top-0 left-full ml-2 bg-gray-800 text-white rounded-md py-1 px-2 opacity-0 hover:opacity-100 transition-opacity duration-200">
+            Click to start
+          </span>
         </button>
       </div>
+
+      {showConfetti && <Confetti />}
 
       <div className="device">
         <div className="device__a">
@@ -50,30 +87,30 @@ const SplashScreenWithLoading = ({ onStart }) => {
       </div>
 
       <style jsx>{`
-        * {
-          border: 0;
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
+        @keyframes animate-fade {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
         }
-
-        :root {
-          --hue: 223;
-          --fg: hsl(var(--hue),10%,90%);
-          --trans-dur: 0.3s;
-          font-size: calc(28px + (60 - 28) * (100vw - 280px) / (3840 - 280));
+        @keyframes animate-shake {
+          0%, 100% { transform: translateX(0); }
+          50% { transform: translateX(-10px); }
         }
-
-        body {
-          background-color: var(--bg);
-          color: var(--fg);
-          display: grid;
-          place-items: center;
-          font: 1em/1.5 sans-serif;
-          height: 100vh;
-          transition: background-color var(--trans-dur), color var(--trans-dur);
+        .tooltip {
+          position: absolute;
+          top: 50%;
+          left: 100%;
+          transform: translateY(-50%);
+          background-color: rgba(0, 0, 0, 0.7);
+          color: #fff;
+          padding: 5px;
+          border-radius: 3px;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.3s;
         }
-
+        button:hover .tooltip {
+          opacity: 1;
+        }
         .device {
           position: relative;
           width: 4em;
@@ -164,426 +201,109 @@ const SplashScreenWithLoading = ({ onStart }) => {
           left: 0;
           width: 4em;
         }
-
-        /* Dark theme */
-        @media (prefers-color-scheme: dark) {
-          :root {
-            --bg: hsl(var(--hue),10%,10%);
-            --fg: hsl(var(--hue),10%,90%);
-          }
-
-          .device__a, .device__d, .device__e {
-            background-color: hsl(var(--hue), 10%, 30%);
-          }
-        }
-
-        /* Animations */
         @keyframes device-a {
           from, to {
             animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
             left: 0;
             width: 4em;
-            height: 2.5em;
+            height: 5.5em;
             transform: translateY(0);
           }
           12.5% {
             animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
             left: 0;
             width: 4em;
-            height: 2.5em;
+            height: 5.5em;
             transform: translateY(1.5em);
           }
           25% {
             animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
             left: 0;
             width: 4em;
-            height: 2.5em;
+            height: 5.5em;
             transform: translateY(0.375em);
           }
           37.5% {
             animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
             left: 0;
             width: 4em;
-            height: 2.5em;
+            height: 5.5em;
             transform: translateY(1.5em);
           }
           50% {
             animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
             left: 1em;
             width: 2em;
-            height: 3em;
+            height: 4em;
             transform: translateY(0.125em);
           }
           62.5% {
             animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
             left: 1em;
-            width: 2em;
-            height: 3em;
-            transform: translateY(1em);
+            width: 4em;
+            height: 4em;
+            transform: translateY(1.5em);
           }
           75% {
             animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            left: 1em;
-            width: 2em;
-            height: 2em;
-            transform: translateY(0.625em);
+            left: 0.5em;
+            width: 4em;
+            height: 4em;
+            transform: translateY(0.5em);
           }
           87.5% {
             animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
-            left: 1em;
-            width: 2em;
-            height: 2em;
-            transform: translateY(1.375em);
+            left: 0.5em;
+            width: 4em;
+            height: 4em;
+            transform: translateY(1.5em);
           }
         }
         @keyframes device-a-1 {
-          from, to {
-            animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            top: 2.25em;
-            left: 1.5em;
-            width: 1em;
-            height: 0.25em;
-            transform: translateY(0);
-          }
           12.5% {
-            animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
-            top: 2.25em;
-            left: 1.5em;
-            width: 1em;
-            height: 0.25em;
-            transform: translateY(0.5em);
-          }
-          25% {
-            animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            top: 2.25em;
-            left: 1.5em;
-            width: 1em;
-            height: 0.25em;
-            transform: translateY(0);
-          }
-          37.5% {
-            animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
-            top: 2.25em;
-            left: 1.5em;
-            width: 1em;
-            height: 0.25em;
-            transform: translateY(0.5em);
+            visibility: visible;
           }
           50% {
-            animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            top: 2.25em;
-            left: 1.5em;
-            width: 1em;
-            height: 0.25em;
-            transform: translateY(0.25em);
+            top: 2em;
           }
-          62.5% {
-            animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
-            top: 2.25em;
-            left: 1.5em;
-            width: 1em;
-            height: 0.25em;
-            transform: translateY(0.5em);
-          }
-        }
+        }	
         @keyframes device-a-2 {
-          from {
-            animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            top: 0.625em;
-            right: 0;
-            width: 0.25em;
-            height: 0.75em;
-            transform: translateY(0);
-          }
           12.5% {
-            animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
-            top: 0.625em;
-            right: 0;
-            width: 0.25em;
-            height: 0.75em;
-            transform: translateY(0.5em);
-          }
-          25% {
-            animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            top: 0.625em;
-            right: 0;
-            width: 0.25em;
-            height: 0.75em;
-            transform: translateY(0);
-          }
-          37.5% {
-            animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
-            top: 0.625em;
-            right: 0;
-            width: 0.25em;
-            height: 0.75em;
-            transform: translateY(0.5em);
-          }
-          50% {
-            animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            top: 0.625em;
-            right: 0;
-            width: 0.25em;
-            height: 0.75em;
-            transform: translateY(0);
-          }
-          62.5% {
-            animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
-            top: 0.625em;
-            right: 0;
-            width: 0.25em;
-            height: 0.75em;
-            transform: translateY(0.5em);
+            visibility: visible;
           }
         }
         @keyframes device-b {
-          from {
-            animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            left: 1.875em;
-            width: 0.25em;
-            height: 1em;
-            transform: translateY(0);
-          }
-          12.5% {
-            animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
-            left: 1.875em;
-            width: 0.25em;
-            height: 1em;
-            transform: translateY(0.75em);
-          }
           25% {
-            animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            left: 1.875em;
-            width: 0.25em;
-            height: 1em;
-            transform: translateY(0.5em);
-          }
-          37.5% {
-            animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
-            left: 1.875em;
-            width: 0.25em;
-            height: 1em;
-            transform: translateY(0.75em);
-          }
-          50% {
-            animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            left: 1.875em;
-            width: 0.25em;
-            height: 1em;
-            transform: translateY(0.75em);
-          }
-          62.5% {
-            animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
-            left: 1.875em;
-            width: 0.25em;
-            height: 1em;
-            transform: translateY(1.25em);
-          }
-          75% {
-            animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            left: 1.875em;
-            width: 0.25em;
-            height: 1em;
-            transform: translateY(1.25em);
-          }
-          87.5% {
-            animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
-            left: 1.875em;
-            width: 0.25em;
-            height: 1em;
-            transform: translateY(1.75em);
+            height: 3.875em;
           }
         }
         @keyframes device-c {
-          from {
-            animation-timing-function: steps(1, end);
-            top: 3em;
-            left: 1em;
-            width: 2em;
-            height: 0.25em;
-            transform: translateY(0);
-          }
-          to {
-            animation-timing-function: steps(1, end);
-            top: 3em;
-            left: 1em;
-            width: 2em;
-            height: 0.25em;
-            transform: translateY(0.5em);
+          25% {
+            transform: translateX(1em);
+            width: 0.25em;
           }
         }
         @keyframes device-d {
-          from {
-            animation-timing-function: steps(1, end);
-            top: 0.75em;
-            left: 1.25em;
-            width: 1.5em;
-            height: 0.875em;
-            transform: translateY(0);
+          37.5% {
+            visibility: visible;
           }
-          to {
-            animation-timing-function: steps(1, end);
-            top: 0.75em;
-            left: 1.25em;
-            width: 1.5em;
-            height: 0.875em;
-            transform: translateY(0.5em);
+          50% {
+            top: 0.875em;
           }
         }
         @keyframes device-e {
-          from {
-            animation-timing-function: steps(1, end);
-            top: 1.625em;
-            left: 1.25em;
-            width: 1.5em;
-            height: 0.875em;
-            transform: translateY(0);
-          }
-          to {
-            animation-timing-function: steps(1, end);
-            top: 1.625em;
-            left: 1.25em;
-            width: 1.5em;
-            height: 0.875em;
-            transform: translateY(0.5em);
+          37.5% {
+            visibility: visible;
           }
         }
         @keyframes device-f {
-          from {
-            animation-timing-function: steps(1, end);
-            top: 1.625em;
-            left: 1.25em;
-            width: 1.5em;
-            height: 0.875em;
-            transform: translateY(0);
-          }
-          to {
-            animation-timing-function: steps(1, end);
-            top: 1.625em;
-            left: 1.25em;
-            width: 1.5em;
-            height: 0.875em;
-            transform: translateY(0.5em);
+          50% {
+            opacity: 0;
           }
         }
         @keyframes device-g {
-          from {
-            animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            top: 1.25em;
-            left: 0;
-            width: 4em;
-            height: 0.25em;
-            transform: translateY(0);
-          }
-          50% {
-            animation-timing-function: cubic-bezier(0.33, 1, 0.67, 1);
-            top: 1.25em;
-            left: 0;
-            width: 4em;
-            height: 0.25em;
-            transform: translateY(0.5em);
-          }
-          100% {
-            animation-timing-function: cubic-bezier(0.33, 0, 0.67, 0);
-            top: 1.25em;
-            left: 0;
-            width: 4em;
-            height: 0.25em;
-            transform: translateY(0);
-          }
-        }
-
-        /* Title animations */
-        @keyframes animate-bounce {
-          0%, 20%, 50%, 80%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-30px);
-          }
-        }
-
-        @keyframes animate-spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes animate-pulse {
-          0% {
-            opacity: 1;
-          }
           50% {
             opacity: 0.5;
-          }
-          100% {
-            opacity: 1;
-          }
-        }
-
-        @keyframes animate-fade {
-          0% {
-            opacity: 0;
-          }
-          50% {
-            opacity: 1;
-          }
-          100% {
-            opacity: 0;
-          }
-        }
-
-        @keyframes animate-shake {
-          0% {
-            transform: translateX(0);
-          }
-          25% {
-            transform: translateX(-5px);
-          }
-          50% {
-            transform: translateX(0);
-          }
-          75% {
-            transform: translateX(5px);
-          }
-          100% {
-            transform: translateX(0);
-          }
-        }
-
-        .animate-bounce {
-          animation: animate-bounce 1s infinite;
-        }
-        .animate-spin {
-          animation: animate-spin 1s linear infinite;
-        }
-        .animate-pulse {
-          animation: animate-pulse 1s infinite;
-        }
-        .animate-fade {
-          animation: animate-fade 1s infinite;
-        }
-        .animate-shake {
-          animation: animate-shake 1s infinite;
-        }
-
-        .shadow-title {
-          text-shadow: 0 0 0.5em rgba(0, 0, 0, 0.6);
-        }
-        .animate-button {
-          animation: button-animation 2s infinite;
-        }
-        @keyframes button-animation {
-          0%, 100% {
-            background-color: #000;
-            color: #fff;
-          }
-          50% {
-            background-color: #fff;
-            color: #000;
           }
         }
       `}</style>
