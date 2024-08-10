@@ -52,7 +52,7 @@ function App() {
     if (!question.trim()) return;
 
     setGeneratingAnswer(true);
-    addMessage("User", question);
+    addMessage("Me", question);
     setAnswer("Loading Bhirava...  \n I Will get You 300 Units of information in 10 seconds");
 
     try {
@@ -183,7 +183,7 @@ function App() {
     const element = document.createElement("a");
     const file = new Blob([messages.map(msg => `${msg.sender}: ${msg.text}`).join('\n')], {type: 'text/plain'});
     element.href = URL.createObjectURL(file);
-    element.download = "conversation.txt";
+    element.download = "Your data.txt";
     document.body.appendChild(element);
     element.click();
   };
@@ -236,11 +236,11 @@ function App() {
                 {messages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`flex mb-2 animate-shadowColorChangeInner ${msg.sender === "User" ? "justify-end" : "justify-start"}`}
+                    className={`flex mb-2 animate-shadowColorChangeInner ${msg.sender === "Me" ? "justify-end" : "justify-start"}`}
                   >
                     <div
                       className={`rounded-lg p-3 shadow-md animate-shadowColorChangeInner ${
-                        msg.sender === "User" ? "bg-orange-500 text-white" : "bg-gray-200 text-black"
+                        msg.sender === "Me" ? "bg-orange-500 text-white" : "bg-gray-200 text-black"
                       }`}
                     >
                       <p className="font-semibold">{msg.sender}:</p>
@@ -262,7 +262,7 @@ function App() {
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   placeholder="Ask your question..."
-                  className="flex-1 py-2 px-4 rounded-md shadow-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300"
+                  className="flex-1 py-2 px-4 rounded-md shadow-md border border-gray-300 focus:text-black focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300"
                 />
                 <button
                   type="button"
