@@ -79,4 +79,3 @@ This project uses the Google Gemini API for content generation. The Gemini API a
 - **Endpoint:** `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent`
 - **Method:** `POST`
 - **Parameters:** Includes user queries as input to generate responses.
-
